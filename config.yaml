@@ -1,28 +1,66 @@
 # override permissions for any command
 permissions:
   liveinteraction:
-    whitelist:
-      - "${ ROLES.PILLAR_STAFF }"
-      - "${  ROLES.MODERATOR  }"
+    whitelist: ${ [ ROLES.PILLAR_STAFF, ...getValuesRecursive(ROLES.ADMIN) ] }
 
   livecommand:
-    whitelist:
-      - "${ ROLES.PILLAR_STAFF }"
-      - "${  ROLES.MODERATOR  }"
+    whitelist: ${ [ ROLES.PILLAR_STAFF, ...getValuesRecursive(ROLES.ADMIN) ] }
 #   # Its possible to set permissions for internal commands too.
-#   role:
-#     whitelist:
-#       - "${ ROLES.MODERATOR }"
+
+  role:
+    whitelist: >-
+      ${ [ 
+        ...getValuesRecursive(ROLES.ADMIN), 
+        ROLES.PILLAR_HEAD, 
+        ROLES.PILLAR_VICE_HEAD
+      ] }
+
+  serverinfo:
+    whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN) ] }
+
+  # point system
+  points/add:
+    whitelist: >-
+      ${ [ 
+          ...getValuesRecursive(ROLES.ADMIN), 
+          ROLES.PILLAR_HEAD, 
+          ROLES.PILLAR_VICE_HEAD, 
+          ROLES.STAFF_ADMIN,
+          ROLES.STAFF_HEAD
+        ] }
+
+  points/list:
+    whitelist: >-
+      ${ [ 
+          ...getValuesRecursive(ROLES.ADMIN), 
+          ROLES.PILLAR_HEAD, 
+          ROLES.PILLAR_VICE_HEAD,
+          ROLES.STAFF_ADMIN,
+          ROLES.STAFF_HEAD
+        ] }
+
+  points/clean: 
+    whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN) ], ROLES.STAFF_ADMIN }
+
+  points/import: 
+    whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN) ], ROLES.STAFF_ADMIN }
+
+  points/get:
+    whitelist: >-
+      ${ [ 
+        ...getValuesRecursive(ROLES.ADMIN), 
+        ROLES.PILLAR_STAFF, 
+        ROLES.STAFF.GUHUA_GUIDE,
+        ROLES.STAFF_KQM
+      ] }
 #
 #   # Its possible to set permissions for custom commands
 #   echo:
-#     whitelist:
-#       - "${ ROLES.MODERATOR }"
+#     whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN) ] }
 #
 #   # Its possible to set permissions for custom commands in folders
 #   characters/amber:
-#     whitelist:
-#       - "${ ROLES.MODERATOR }"
+#     whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN) ] }
 
 
 # Only delete stuff after this line if you know what you're doing.
@@ -30,24 +68,14 @@ modules:
   userNotes:
     enabled: true
     permissions:
-      whitelist:
-        - "${  ROLES.MODERATOR  }"
-        - "${  ROLES.ADMIN  }"
-        - "${  ROLES.KEQINGS_KEY  }"
-        - "${  ROLES.MOD  }"
+      whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN), ...getValuesRecursive(ROLES.MOD) ] }
 
   pointsSystem:
     enabled: true
     permissions:
-      whitelist:
-        - "${ ROLES.MODERATOR }"
-        - "${ ROLES.ADMIN }"
-        - "${ ROLES.KEQINGS_KEY }"
-        - "${ ROLES.GUHUA_GUIDE_GRANDMASTER }"
-        - "${ ROLES.WANGSHENG_DIRECTOR }"
-        - "${ ROLES.WANGSHENG_ASST_DIRECTOR }"
+      whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN), ROLES.VERIFIED, ROLES.STAFF_ADMIN, ROLES.STAFF_HEAD, ROLES.STAFF_KQM ] }
         
-    loggingChannel: "${ CHANNELS.BOT_LOGGING }"
+    loggingChannel: "${ CHANNELS.GI_BOT_LOGGING }"
     
   vanityRoles:
     enabled: true
@@ -59,43 +87,62 @@ modules:
         - "${ ROLES.PATREON_ADEPTUS }"
 
     # Log whenever someone's custom role is updated
-    loggingChannel: "BOT_LOGGING"
+    loggingChannel: "${ CHANNELS.GI_BOT_LOGGING }"
+
+    createRoleAfter: "${ ROLES.PATREON_ADEPTUS }"
 
   reactRoles:
     enabled: true
 
     # Who can use the /reactroles command, anyone with MANAGE_ROLES if not set.
     permissions:
-      whitelist:
-        - "${ ROLES.MODERATOR }"
-        - "${ ROLES.ADMIN }"
-        - "${ ROLES.KEQINGS_KEY }"
+      whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN) ] }
 
     configs:
-      randomRole:
-        title: "Get a random role"
-        description: |-
-          Get a random role out of <@&947365141450727495>, <@&947356633737080853>, and <@&947356702318153749>
+      # randomRole:
+      #   title: "Get a random role"
+      #   description: |-
+      #     Get a random role out of <@&947365141450727495>, <@&947356633737080853>, and <@&947356702318153749>
 
-        permissions:
-          blacklist:
-            - "947365141450727495"
-            - "947356633737080853"
-            - "947356702318153749"
+      #   permissions:
+      #     blacklist:
+      #       - "947365141450727495"
+      #       - "947356633737080853"
+      #       - "947356702318153749"
           
-        reactions:
-          "pe:946999484175491102":
-            role: >
-              ${
-                const reactionRoles = [
-                  "947365141450727495",
-                  "947356633737080853",
-                  "947356702318153749"
-                ];
+      #   reactions:
+      #     "pe:946999484175491102":
+      #       role: >
+      #         ${
+      #           const reactionRoles = [
+      #             "947365141450727495",
+      #             "947356633737080853",
+      #             "947356702318153749"
+      #           ];
 
-                reactionRoles[Math.floor(Math.random() * reactionRoles.length)];
-              }
-            description: "Random Role"
+      #           reactionRoles[Math.floor(Math.random() * reactionRoles.length)];
+      #         }
+      #       description: "Random Role"
+
+      keqkey:
+        title: "Keqing's Key"
+        color: ${ COLORS.ELECTRO_PURPLE }
+        description:
+        permissions:
+          whitelist: >- 
+            ${ [ 
+              ...getValuesRecursive(ROLES.ADMIN), 
+              ROLES.HEAD_MILLELITH, 
+              ROLES.HONORARY_QIXING,
+              ROLES.VICE_HEAD_MILLELITH,
+              ROLES.PILLAR_HEAD,
+              ROLES.PILLAR_VICE_HEAD
+            ] }
+
+        reactions:
+          "love:767201369525321758":
+            role: "${ ROLES.ADMIN.KEQINGS_KEY }"
+            description: ":key: Break glass in case of emergency."
 
       main:
         image: "https://cdn.discordapp.com/attachments/810941835949244447/811264667867414558/unknown.png"
@@ -119,9 +166,10 @@ modules:
           "based:945928754973270067":
             role: "945554661413367819"
             description: "Absolutely"
-      
+
+      # TC Readme Reacts
       theoryreadme:
-        image: "https://media.discordapp.net/attachments/763589418086432778/813379829151301642/GI_-_KQM_2.png"
+        image: "https://cdn.discordapp.com/attachments/763589418086432778/813379829151301642/GI_-_KQM_2.png"
         title: "Theorycrafting Section Roles"
         color: ${ COLORS.ELECTRO_PURPLE }
         description: |-
@@ -132,45 +180,357 @@ modules:
 
         reactions:
           # REACTION EMOJI ID: ROLE
-          "keqdesk:813764611878682664":
+          "KeqingThink:1027399545430212671":
             role: "${ ROLES.THEORYCRAFTER }"
-            description: "<@&${ ROLES.THEORYCRAFTER }>"
+            description: "<@&${ ROLES.THEORYCRAFTER }>: Access to the TC Section"
 
           "keqnote:838482574644346931":
             role: "${ ROLES.LIBRARY_SUBMISSIONS }"
-            description: "<@&${ ROLES.LIBRARY_SUBMISSIONS }>"
-
-          "keqsalute:829758345619570749":
-            role: "${ ROLES.THEORYHUNTER }"
-            description: "<@&${ ROLES.THEORYHUNTER }>"
-
-          "madamekePING:813377572002988093":
-            role: "${ ROLES.TC_PING }"
-            description: "<@&${ ROLES.TC_PING }>"
+            description: "<@&${ ROLES.LIBRARY_SUBMISSIONS }>: Access to the TC Tickets"
 
           "keqingPain:854599966432559154":
             role: "${ ROLES.GUIDE_SUBMISSIONS }"
-            description: "<@&${ ROLES.GUIDE_SUBMISSIONS }>"
-          
+            description: "<@&${ ROLES.GUIDE_SUBMISSIONS }>: Access to Guide Tickets"
 
-      staff:
-        image: "https://cdn.discordapp.com/attachments/945321873418362880/953178188639531078/unknown.png"
-        title: "Emergency Staff Allocation"
+          "KeqSalute:1021891784713969715":
+            role: "${ ROLES.THEORYHUNTER }"
+            description: "<@&${ ROLES.THEORYHUNTER }>: Be notified when a theoryhunt is posted"
+
+          "madamePING:776287232579207198":
+            role: "${ ROLES.TC_PING }"
+            description: "<@&${ ROLES.TC_PING }>: Be notified about important TC announcements"
+
+      theoryreadme2:
+        title: "Guide & Calc Verification"
+        color: ${ COLORS.ELECTRO_PURPLE }
         description: |-
-          This command should only be able to be used by staff. Please gather roles that you think you were missing. Abuse of this command will be punished.
-        # Literally ALL staff roles
+          React to be pinged for Guide or Calc Verifications (available to TC Staff & <@&${ ROLES.WANGSHENG_THEORYCRAFTER }>).
+
+          *You will be pinged in Guide Tickets when they are ready to be verified.*
+        permissions:
+          whitelist: >- 
+            ${ [ 
+              ...getValuesRecursive(ROLES.ADMIN), 
+              ROLES.WANGSHENG_THEORYCRAFTER, 
+              ROLES.STAFF.TC_STAFF,
+              ROLES.STAFF.WANGSHENG_EDITOR, 
+              ROLES.STAFF.WANGSHENG_SCHOLAR, 
+              ROLES.STAFF.WANGSHENG_MONKE,
+              ROLES.STAFF.WFP_TC_STAFF,
+              ROLES.STAFF.WANGSHENG_ASST_EDITOR,
+              ROLES.WANGSHENG_DIRECTOR, 
+              ROLES.WANGSHENG_ASST_DIRECTOR
+            ] }
+        reactions:
+
+          "keqisee:776297817438289920":
+            role: "${ ROLES.GUIDE_VERIFICATION }"
+            description: "<@&${ ROLES.GUIDE_VERIFICATION }>: Gives you the Guide Verification Role"   
+    
+          "KeqingSparkle:779046540408127521":
+            role: "${ ROLES.CALC_VERIFICATION }"
+            description: "<@&${ ROLES.CALC_VERIFICATION }>: Gives you the Calc Verification Role"     
+
+      guidesubmissionreactrole:
+        title: "Guide Submissions React Role"
+        color: ${ COLORS.ELECTRO_PURPLE }
+        description: |-
+          Optional react role to see guide tickets. If you are interested in guide work, you will find tickets for ongoing guide projects. 
+
         permissions:
           whitelist:
-            - "${ ROLES.STAFF }"
-            - "${ ROLES.PILLAR_STAFF }"
+            - "${ ROLES.VERIFIED }"
 
         reactions:
           # REACTION EMOJI ID: ROLE
-          "kapetayo:904967085170491412":
-            role: "${ ROLES.PILLAR_STAFF }"
-            description: "Pillar Staff"
+
+          "keqingflower:1049870812796178442":
+            role: "${ ROLES.GUIDE_SUBMISSIONS }"
+            description: "<@&${ ROLES.GUIDE_SUBMISSIONS }>: Gives you the Guide Verification Role which provides access to Guide Channels."  
+         
+      # Offtopic React Role
+      offtopicreactrole:
+        title: "Get access to the Offtopic part of KQM"
+        color: ${ COLORS.ELECTRO_PURPLE }
+        description: |-
+          React with the matching emoji for specific roles
+        permissions:
+          whitelist:
+            - "${ ROLES.VERIFIED }"
+
+        reactions:
+          # REACTION EMOJI ID: ROLE
+          "morapls:770223616112853024":
+            role: "${ ROLES.OFFTOPIC }"
+            description: "<@&${ ROLES.OFFTOPIC }>: Access to all of Offtopic"
+
+      # Feiyun React Role
+      feiyunreact:
+        title: "Feiyun React Roles"
+        color: ${ COLORS.ELECTRO_PURPLE }
+        description: |-
+          React with the matching emoji for specific roles
+        permissions:
+          whitelist:
+            - "${ ROLES.STAFF.FEIYUN_FILM_CREW }"
+
+        reactions:
+          # REACTION EMOJI ID: ROLE
+          "🎞️":
+            role: "${ ROLES.STAFF.FEIYUN_FILM_VIDEO_EDITOR }"
+            description: "<@&${ ROLES.STAFF.FEIYUN_FILM_VIDEO_EDITOR }>: Role for Video Editor"
+
+          "⌨️":
+            role: "${ ROLES.STAFF.FEIYUN_FILM_SCRIPT_WRITER }"
+            description: "<@&${ ROLES.STAFF.FEIYUN_FILM_SCRIPT_WRITER }>: Role for Script Writer"
+
+          "🔭":
+            role: "${ ROLES.STAFF.FEIYUN_FILM_CONTENT_QC }"
+            description: "<@&${ ROLES.STAFF.FEIYUN_FILM_CONTENT_QC }>: Role for Content QC"
+
+          "🔍":
+            role: "${ ROLES.STAFF.FEIYUN_FILM_VIDEO_QC }"
+            description: "<@&${ ROLES.STAFF.FEIYUN_FILM_VIDEO_QC }>: Role for Video QC"
+
+          "🔬":
+            role: "${ ROLES.STAFF.FEIYUN_FILM_GRAMMAR_QC }"
+            description: "<@&${ ROLES.STAFF.FEIYUN_FILM_GRAMMAR_QC }>: Role for Grammar QC"
+
+          "📷":
+            role: "${ ROLES.STAFF.FEIYUN_FILM_RECORDER }"
+            description: "<@&${ ROLES.STAFF.FEIYUN_FILM_RECORDER }>: Role for Recorder"
+
+          "🎙️":
+            role: "${ ROLES.STAFF.FEIYUN_FILM_VOICEOVER }"
+            description: "<@&${ ROLES.STAFF.FEIYUN_FILM_VOICEOVER }>: Role for Voiceover"          
 
             
+      # Directory Reacts
+      reactrolesnotification:
+        image: "https://cdn.discordapp.com/attachments/954233449953234964/958172135996686356/kqm_notification_roles.png"
+        title: "・                                       Notifications                                      ・"
+        color: ${ COLORS.ELECTRO_PURPLE }
+        description: |-
+          React with the matching emoji for the pings you are interested in.
+        permissions:
+          whitelist:
+            - "${ ROLES.VERIFIED }"
+
+        reactions:
+          "madamePING:776287232579207198":
+            role: "${ ROLES.ALERT_ANNOUNCEMENTS }"
+            description: "Important server announcements"
+
+          "🏟️":
+            role: "${ ROLES.ALERT_TRUSTED_CREATORS }"
+            description: "Trusted Creators release content"
+
+          "twitch:956835761745956876":
+            role: "${ ROLES.ALERT_TWITCH }"
+            description: "KQM Twitch goes live\n"
+
+          "primogem:768816635120713769":
+            role: "${ ROLES.ALERT_CODES }"
+            description: "Primogem redeem codes are released."
+
+          "🎟️":
+            role: "${ ROLES.ALERT_GIVEAWAYS }"
+            description: "Giveaways (skins, Welkins, BPs, and more!)."
+            
+          "KeqParty:805672780606734347":
+            role: ${ ROLES.EVENTS_KITTEN }
+            description: "Server events, including karaoke, game nights & more!"
+
+          "yaetcg:1066298575463649290":
+            role: "${ ROLES.ALERT_TCG }"
+            description: "GI TCG Events & Announcements"
+
+          "webevents:1035763039644942386":
+            role: "${ ROLES.ALERT_WEB_EVENTS }"
+            description: "A new Genshin Web Event is released.\n\n**・   Daily Alerts   ・**\nReact below for daily game alerts.\n"
+
+          "🟥":
+            role: "${ ROLES.ALERT_DAILY_ASIA }"
+            description: "Dailies Alert - Asia and SAR Servers"
+
+          "🟦":
+            role: "${ ROLES.ALERT_DAILY_AMERICA }"
+            description: "Dailies Alert - America Server"
+
+          "🟫":
+            role: "${ ROLES.ALERT_DAILY_EUROPE }"
+            description: "Dailies Alert - Europe Server"
+
+      reactrolesregions:
+        image: "https://cdn.discordapp.com/attachments/954233449953234964/958172136613240892/kqm_region_roles.png"
+        title: "・                                       Coop Roles                                      ・"
+        color: ${ COLORS.ELECTRO_PURPLE }
+        description: |-
+          React here to join coop-chat for your game region.
+        permissions:
+          whitelist:
+            - "${ ROLES.VERIFIED }"
+
+        reactions:
+          "🟥":
+            role: "${ ROLES.REGION_ASIA }"
+            description: "Asia Server"
+
+          "🟦":
+            role: "${ ROLES.REGION_AMERICA }"
+            description: "America Server"
+
+          "🟫":
+            role: "${ ROLES.REGION_EUROPE }"
+            description: "Europe Server"
+
+          "🟨":
+            role: "${ ROLES.REGION_TWHKMO }"
+            description: "TW/HK/MO Server"
+
+      reactrolescategory:
+        image: "https://cdn.discordapp.com/attachments/954233449953234964/958172135791149076/kqm_category_roles.png"
+        title: "・                                       Categories                                      ・"
+        color: ${ COLORS.ELECTRO_PURPLE }
+        description: |-
+          React here to unlock the respective channels in the server.
+        permissions:
+          whitelist:
+            - "${ ROLES.VERIFIED }"
+
+        reactions:
+          "🖼️":
+            role: "${ ROLES.MEDIA }"
+            description: "Media *(Visible by default)*"
+
+          "🟣":
+            role: "${ ROLES.LEWD }"
+            description: "Lewd (18+ only)\n\n➜ For access to the theorycrafting category, react in <#939411507127668758>."
+
+      reactrolespronoun:
+        image: "https://cdn.discordapp.com/attachments/954233449953234964/958172136365752380/kqm_pronoun_roles.png"
+        title: "・                                       Pronouns                                      ・"
+        color: ${ COLORS.ELECTRO_PURPLE }
+        permissions:
+          whitelist:
+            - "${ ROLES.VERIFIED }"
+
+        reactions:
+          "🟦":
+            role: "${ ROLES.PRONOUN_M }"
+            description: "He/Him"
+
+          "🟥":
+            role: "${ ROLES.PRONOUN_F }"
+            description: "She/Her"
+
+          "🟪":
+            role: "${ ROLES.PRONOUN_T }"
+            description: "They/Them"
+
+          "🟩":
+            role: "${ ROLES.PRONOUN_ASK }"
+            description: "Ask for Pronouns"
+
+      # Coop Category Regions
+      reactrolescoopregions:
+        title: "・                                      Region Roles                                     ・"
+        color: ${ COLORS.ELECTRO_PURPLE }
+        description: |-
+          React here to join the co-op chat for your game region.
+        permissions:
+          whitelist:
+            - "${ ROLES.VERIFIED }"
+
+        reactions:
+          "🟥":
+            role: "${ ROLES.REGION_ASIA }"
+            description: "Asia Server"
+
+          "🟦":
+            role: "${ ROLES.REGION_AMERICA }"
+            description: "America Server"
+
+          "🟫":
+            role: "${ ROLES.REGION_EUROPE }"
+            description: "Europe Server"
+
+          "🟨":
+            role: "${ ROLES.REGION_TWHKMO }"
+            description: "TW/HK/MO Server"
+
+      # Coop Category Pings
+      reactrolescooppings:
+        title: "・                                Co-Op Ping Roles                                    ・"
+        color: ${ COLORS.ELECTRO_PURPLE }
+        description: |-
+          React here to be pinged for various co-op activities.
+        permissions:
+          whitelist:
+            - "${ ROLES.VERIFIED }"
+
+        reactions:
+          "keqwave:1036844947304894464":
+            role: "${ ROLES.SEELIE }"
+            description: "<@&${ ROLES.SEELIE }>: General Co-Op Ping"
+
+          "QiqiPeek:781028042708746260":
+            role: "${ ROLES.TEAPOT_EXCHANGE }"
+            description: "<@&${ ROLES.TEAPOT_EXCHANGE }>: For exchanging teapot shops"
+
+          "KeqSalute:1021891784713969715":
+            role: "${ ROLES.ELITE_SHARING }"
+            description: "<@&${ ROLES.ELITE_SHARING }>: For sharing world elites"
+
+          "keqWant:908000006974369802":
+            role: "${ ROLES.ELITE_TRADING }"
+            description: "<@&${ ROLES.ELITE_TRADING }>: For trading world elites"
+
+          "CrystalOre:1186554203435454505":
+            role: "${ ROLES.CRYSTAL_SHARING }"
+            description: "<@&${ ROLES.CRYSTAL_SHARING }>: For sharing crystal chunks"
+
+          "ClownTao:1186562519167410227":
+            role: "${ ROLES.FRIENDSHIP }"
+            description: "<@&${ ROLES.FRIENDSHIP }>: For co-op friendship farming"
+
+      # Events Ping
+      reactroleevents:
+        title: "React for Events!"
+        color: ${ COLORS.ELECTRO_PURPLE }
+
+        reactions:
+          "KeqParty:805672780606734347":
+            role: ${ ROLES.EVENTS_KITTEN }
+            description: "<@&${ ROLES.EVENTS_KITTEN }>: React here if you want to be notified about future events, including karaoke, game nights & more!"
+
+      # NSFW Staff channel
+      reactrolestaffnsfw:
+        title: "Staff NSFW Channel Access 18+ Only"
+        color: ${ COLORS.ELECTRO_PURPLE }
+
+        reactions:
+          "kikin:959474754971127819":
+            role: ${ ROLES.STAFF.STAFF_LEWD }
+            description: "<@&${ ROLES.STAFF.STAFF_LEWD }>"
+        
+      #staff:
+      #  image: "https://cdn.discordapp.com/attachments/945321873418362880/953178188639531078/unknown.png"
+      #  title: "Emergency Staff Allocation"
+      #  description: |-
+      #    This command should only be able to be used by staff. Please gather roles that you think you were missing. Abuse of this command will be punished.
+      #  # Literally ALL staff roles
+      #  permissions:
+      #    whitelist:
+      #      - "${ ROLES.STAFF }"
+      #      - "${ ROLES.PILLAR_STAFF }"
+      #
+      #  reactions:
+      #    # REACTION EMOJI ID: ROLE
+      #    "kapetayo:904967085170491412":
+      #      role: "${ ROLES.PILLAR_STAFF }"
+      #      description: "Pillar Staff"
+          
   modMail:
     enabled: true
 
@@ -191,68 +551,113 @@ modules:
 
     # This restricts who can use the /rolekits command. if its not set, anyone with the MANAGE_ROLES permission can use the command.
     permissions: 
-      whitelist: 
-        - "${ ROLES.ADMIN }"
-        - "${ ROLES.KEQINGS_KEY }"
-        - "${ ROLES.PILLAR_STAFF }"
-        - "${ ROLES.THE_TRADES }"
-        - "${ ROLES.STAFF.WANGSHENG_SCHOLAR }"
-        - "${ ROLES.STAFF.WANGSHENG_EDITOR }"
+      whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN), ROLES.PILLAR_STAFF, ROLES.STAFF.WANGSHENG_SCHOLAR, ROLES.STAFF.WANGSHENG_EDITOR, ROLES.VERIFIED ] }
 
     # The kits that are available
-    kits:  
+    kits:
+    
+      hiatus:
+        exportAsCommand: true
+        name: Hiatus
+        permissions: 
+          whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN), ROLES.PILLAR_HEAD, ROLES.PILLAR_VICE_HEAD ] }
+        addRoles:
+          - "${ ROLES.HIATUS }"
+        removeRoles:
+          - "${ ROLES.STAFF.YUEHAI_LEAKS_WHISPERER }"
+          - "${ ROLES.STAFF.WANWEN_LORE_RESEARCHER }"
+          - "${ ROLES.STAFF.TC_STAFF }"
+          - "${ ROLES.STAFF.WANGSHENG_EDITOR }"
+          - "${ ROLES.STAFF.WANGSHENG_SCHOLAR }"
+          - "${ ROLES.STAFF.WANGSHENG_MONKE }"
+          - "${ ROLES.STAFF.WFP_TC_STAFF }"
+          - "${ ROLES.STAFF.WANGSHU_INN }"
+          - "${ ROLES.STAFF.QINGCE_ART_CURATOR }"
+          - "${ ROLES.STAFF.GUHUA_GUIDE }"
+          - "${ ROLES.STAFF.GUHUA_STUDENT }"
+          - "${ ROLES.STAFF.GUHUA_SCRIBE }"
+          - "${ ROLES.STAFF.LIVESTREAM_TEAM }"
+          - "${ ROLES.STAFF.JADE_PALACE_SECRETARY }"
+          - "${ ROLES.STAFF.FEIYUN_FILM_CREW }"
+          - "${ ROLES.STAFF.FEIYUN_FILM_VIDEO_EDITOR }"
+          - "${ ROLES.STAFF.FEIYUN_FILM_SCRIPT_WRITER }"
+          - "${ ROLES.STAFF.FEIYUN_FILM_CONTENT_QC }"
+          - "${ ROLES.STAFF.FEIYUN_FILM_VIDEO_QC }"
+          - "${ ROLES.STAFF.FEIYUN_FILM_GRAMMAR_QC }"
+          - "${ ROLES.STAFF.FEIYUN_FILM_RECORDER }"
+          - "${ ROLES.STAFF.FEIYUN_FILM_VOICEOVER }"
+          - "${ ROLES.STAFF.GUHUA_ADVENTURER }"
+          - "${ ROLES.STAFF.DIHUA }"
+          - "${ ROLES.STAFF.YANSHANG_TEAHOUSE_STAFF }"
+          - "${ ROLES.STAFF.JADE_PALACE }"
+          - "${ ROLES.STAFF.CRUX_ARTIST }"
+          - "${ ROLES.STAFF.CRUX_DESIGNER }"
+          - "${ ROLES.MANAGING_EDITOR }"
+          - "${ ROLES.STAFF.WANGSHENG_ASST_EDITOR }"
+          - "${ ROLES.MOD.MILLELITH }"
+          - "${ ROLES.MOD.SAL_TERRAE_SUBREDDIT }"
+
       wangshengcoffin:
         exportAsCommand: true
         name: Wangsheng Coffin
         permissions: 
-          whitelist:
-            - "${ ROLES.MOD.MILLELITH }"
-            - "${ ROLES.MOD.WANGSHENG }"
-            - "${ ROLES.WANGSHENG_DIRECTOR }"
-            - "${ ROLES.WANGSHENG_ASST_DIRECTOR }"
+          whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN), ROLES.MOD.MILLELITH, ROLES.MOD.WANGSHENG, ROLES.WANGSHENG_DIRECTOR, ROLES.WANGSHENG_ASST_DIRECTOR ] }
         addRoles:
-          - "${ ROLES.WANGSHENG_COFFIN } "
+          - "${ ROLES.WANGSHENG_COFFIN }"
         removeRoles:
           - "${ ROLES.THEORYCRAFTER }"
           - "${ ROLES.THEORYHUNTER }"
           - "${ ROLES.LIBRARY_SUBMISSIONS }"
           - "${ ROLES.GUIDE_SUBMISSIONS }"
 
+      removewangshengcoffin:
+        exportAsCommand: true
+        name: Remove Wangsheng Coffin
+        permissions: 
+          whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN), ROLES.MOD.MILLELITH, ROLES.MOD.WANGSHENG, ROLES.WANGSHENG_DIRECTOR, ROLES.WANGSHENG_ASST_DIRECTOR ] }
+        removeRoles:
+          - "${ ROLES.WANGSHENG_COFFIN }"
+      
       guhuacoffin:
         exportAsCommand: true
         name: Guhua Exile
         permissions: 
-          whitelist: 
-            - "${ ROLES.MOD.MILLELITH }"
-            - "${ ROLES.MOD.GUHUA }"
-            - "${ ROLES.GUHUA_GUIDE_GRANDMASTER }"
+          whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN), ROLES.MOD.MILLELITH, ROLES.MOD.GUHUA, ROLES.GUHUA_GUIDE_GRANDMASTER ] }
         addRoles:
-          - "${ ROLES.GUHUA_EXILE } "
-        removeRoles:
+          - "${ ROLES.GUHUA_EXILE }"
 
-      leakscoffin:
+      removeguhuacoffin:
         exportAsCommand: true
-        name: Leaky Coffin
+        name: Remove Guhua Exile
         permissions: 
-          whitelist: 
-            - "${ ROLES.MOD.MILLELITH }"
-            - "${ ROLES.MOD.LEAKS }"
-            - "${ ROLES.YUEHAI_LEAKS_HEAD }"
-        addRoles:
-          - "${ ROLES.LEAKY_COFFIN }"
+          whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN), ROLES.MOD.MILLELITH, ROLES.MOD.GUHUA, ROLES.GUHUA_GUIDE_GRANDMASTER ] }
         removeRoles:
-          - "${ ROLES.LEAKS }"
-          - "${ ROLES.LEAKS_PING }"
-      
+          - "${ ROLES.GUHUA_EXILE }"
+
+      offtopiccoffin:
+        exportAsCommand: true
+        name: Offtopic Coffin
+        permissions: 
+          whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN), ROLES.MOD.MILLELITH, ROLES.YUEHAI_LEAKS_HEAD ] }
+        addRoles:
+          - "${ ROLES.OFFTOPIC_COFFIN }"
+        removeRoles:
+          - "${ ROLES.OFFTOPIC }"
+          - "${ ROLES.OFFTOPIC_PING }"
+
+      removeofftopiccoffin:
+        exportAsCommand: true
+        name: Remove Offtopic Coffin
+        permissions: 
+          whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN), ROLES.MOD.MILLELITH, ROLES.YUEHAI_LEAKS_HEAD ] }
+        removeRoles:
+          - "${ ROLES.OFFTOPIC_COFFIN }"
+
       contributor:
         exportAsCommand: true
         name: Wangsheng Contributor
         permissions:
-          whitelist:
-            - "${ ROLES.STAFF.WANGSHENG_SCHOLAR }"
-            - "${ ROLES.STAFF.WANGSHENG_EDITOR }"
-            - "${ ROLES.WANGSHENG_DIRECTOR }"
-            - "${ ROLES.WANGSHENG_ASST_DIRECTOR }"
+          whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN), ROLES.STAFF.WANGSHENG_SCHOLAR, ROLES.STAFF.WANGSHENG_EDITOR, ROLES.WANGSHENG_DIRECTOR, ROLES.WANGSHENG_ASST_DIRECTOR] }
         addRoles:
           - "${ ROLES.WANGSHENG_CONTRIBUTOR }"
           
@@ -260,11 +665,7 @@ modules:
         exportAsCommand: true
         name: Wangsheng Theoryhunter
         permissions:
-          whitelist:
-            - "${ ROLES.STAFF.WANGSHENG_SCHOLAR }"
-            - "${ ROLES.STAFF.WANGSHENG_EDITOR }"
-            - "${ ROLES.WANGSHENG_DIRECTOR }"
-            - "${ ROLES.WANGSHENG_ASST_DIRECTOR }"
+          whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN), ROLES.STAFF.WANGSHENG_SCHOLAR, ROLES.STAFF.WANGSHENG_EDITOR, ROLES.WANGSHENG_DIRECTOR, ROLES.WANGSHENG_ASST_DIRECTOR ] }
         addRoles:
           - "${ ROLES.WANGSHENG_THEORYHUNTER }"
 
@@ -272,11 +673,25 @@ modules:
         exportAsCommand: true
         name: Wangsheng Theorycrafter
         permissions:
-          whitelist:
-            - "${ ROLES.WANGSHENG_DIRECTOR }"
-            - "${ ROLES.WANGSHENG_ASST_DIRECTOR }"
+          whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN), ROLES.WANGSHENG_DIRECTOR, ROLES.WANGSHENG_ASST_DIRECTOR ] }
         addRoles:
           - "${ ROLES.WANGSHENG_THEORYCRAFTER }"
+
+      whale:
+        exportAsCommand: true
+        name: WhaleBTW
+        permissions:
+          whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN) ] }
+        addRoles:
+          - "${ ROLES.WHALEBTW }"
+
+      kqm:
+        exportAsCommand: true
+        name: KeqingMain
+        permissions:
+          whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN) ] }
+        addRoles:
+          - "${ ROLES.KEQINGMAIN }"
 
   # Verification Module
   verification:
@@ -284,15 +699,15 @@ modules:
 
     # This restricts who can use the /verification command. if its not set, anyone can use the command.
     permissions:
-      whitelist:
-        - "${  ROLES.ADMIN  }"
-        - "${  ROLES.KEQINGS_KEY  }"
+      whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN) ] }
 
     # This sets the channel to use for sending the initialMessage into. If this is not set then the bot will not automatically send the welcome message.
     # welcomeChannel: "${  CHANNELS.WELCOME  }"
 
     # The role to add to users when they successfully accept the rules.
-    verifiedRole: "${  ROLES.VERIFIED  }"
+    verifiedRole: 
+      - "${ ROLES.VERIFIED }"
+      - "${ ROLES.MEDIA }"
 
     interactions:
       # You can use this to set a different greeting message. If this is not set then initialMessage is used.
@@ -314,9 +729,7 @@ modules:
 
     # This restricts who can use the /supportthreads command. if its not set, anyone with MANAGE_THREADS permission can use the command.
     permissions:
-      whitelist:
-        - "${  ROLES.ADMIN  }"
-        - "${  ROLES.KEQINGS_KEY  }"
+      whitelist: ${ [ ...getValuesRecursive(ROLES.ADMIN) ] }
 
     configs:
       main:
@@ -344,3 +757,22 @@ modules:
         troubleshootButton:
           title: "TROUBLESHOOT"
           type: "SUCCESS"
+
+      guhuafeedback:
+        # The interaction to display when the command is run.
+        displayInteractionPath: "verification/guhua_feedback"
+
+        # The interaction to display when someone interacts with the supportThreadButton
+        supportThreadConfirmationInteractionPath: "verification/guhua_feedback_confirmation"
+
+        # The interaction to send in the opened thread
+        supportThreadDisplayInteractionPath: "verification/guhua_feedback_thread"
+
+        # The channel to open the thread in
+        supportThreadChannel: "${ CHANNELS.GUHUA_FEEDBACK }"
+
+        # Configure the button to open a support thread, if this is not set then a button with the label "HELP" is used
+        supportThreadButton:
+          title: "Leave Feedback"
+          type: "PRIMARY"
+

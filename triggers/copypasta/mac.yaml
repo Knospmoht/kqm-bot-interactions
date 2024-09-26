@@ -1,0 +1,3 @@
+match: ${ TRIGGER_PREFIX }(?:[fF]ridge)(?:\s|$)
+interaction: 
+  content: https://media.discordapp.net/attachments/982537464344354886/1012369046102081647/fridge.png

@@ -1,0 +1,4 @@
+interaction: affiliates/partner
+description: Partnered Servers / TC network
+match: ${ TRIGGER_PREFIX }partners?(?:\s|$)
+ignoreCase: true

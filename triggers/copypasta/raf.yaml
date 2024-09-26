@@ -1,0 +1,3 @@
+match: ${ TRIGGER_PREFIX }(?:[rR]af)(?:\s|$)
+interaction: 
+  content: https://cdn.discordapp.com/attachments/982537464344354886/1049798311646875668/unknown.png

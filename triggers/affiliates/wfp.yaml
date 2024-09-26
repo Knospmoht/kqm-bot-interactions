@@ -1,0 +1,4 @@
+interaction: affiliates/wfp
+description: Wangsheng Funeral Parlor Links
+match: ${ TRIGGER_PREFIX }(?:wfp|wangsheng funeral parlor)(?:\s|$)
+ignoreCase: true
